@@ -1,0 +1,50 @@
+{
+  "name": "save-on-boozes",
+  "version": "0.0.1",
+  "description": "A booze pricing tracker tool",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node --watch-path=./dist --watch-preserve-output ./dist/index.js",
+    "dev": "tsc --build --verbose --pretty --watch & ( sleep 1 && npm start)",
+    "build": "tsc  --build",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "pricing",
+    "tracker",
+    "web scraper",
+    "screaper",
+    "crawler",
+    "boose",
+    "safe on boozes"
+  ],
+  "author": "Leonardo Otoni",
+  "license": "ISC",
+  "dependencies": {
+    "ajv": "^8.12.0",
+    "dotenv": "^16.4.1",
+    "fastify": "^4.26.0",
+    "loadash": "^1.0.0",
+    "mongodb": "^6.3.0",
+    "pino-pretty": "^10.3.1"
+  },
+  "devDependencies": {
+    "@tsconfig/node20": "^20.1.2",
+    "@types/lodash": "^4.14.202",
+    "@types/node": "^20.11.17",
+    "@typescript-eslint/eslint-plugin": "^5.62.0",
+    "@typescript-eslint/parser": "^5.62.0",
+    "eslint": "^8.56.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-airbnb-typescript": "^17.1.0",
+    "eslint-import-resolver-typescript": "^3.6.1",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-jest": "^27.2.1",
+    "eslint-plugin-json": "^3.1.0",
+    "gulp": "^4.0.2",
+    "jest": "^29.7.0",
+    "typescript": "^5.3.3",
+    "vinyl-sourcemaps-apply": "^0.2.1"
+  }
+}
