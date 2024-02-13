@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "node --watch-path=./dist --watch-preserve-output ./dist/index.js",
-    "dev": "tsc --build --verbose --pretty --watch & ( sleep 1 && npm start)",
+    "dev": "tsc --build --verbose --pretty --watch & ( sleep 2 && npm start)",
     "build": "tsc  --build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -22,14 +22,17 @@
   "author": "Leonardo Otoni",
   "license": "ISC",
   "dependencies": {
+    "@fastify/mongodb": "^8.0.0",
     "ajv": "^8.12.0",
     "dotenv": "^16.4.1",
     "fastify": "^4.26.0",
+    "fastify-plugin": "^4.5.1",
     "loadash": "^1.0.0",
     "mongodb": "^6.3.0",
     "pino-pretty": "^10.3.1"
   },
   "devDependencies": {
+    "@fastify/swagger": "^8.14.0",
     "@tsconfig/node20": "^20.1.2",
     "@types/lodash": "^4.14.202",
     "@types/node": "^20.11.17",

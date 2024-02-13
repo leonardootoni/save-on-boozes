@@ -1,13 +1,12 @@
 import Fastify from 'fastify';
 import _Ajv from 'ajv';
+import mongodb from '@fastify/mongodb';
+import parsers from '../apis/parsers.js';
+import { ENV } from '../common/constants.js';
+import getAppLoggerConfig from '../services/logger.js';
 
-const { default: serverConfig } = await import( './schemas/server_config.json', { assert: { type: 'json' } } );
 
-enum Env {
-  production = 'production',
-  development = 'development',
-  test = 'test',
-}
+const { default: serverConfig } = await import( './server_config.json', { assert: { type: 'json' } } );
 
 interface IConfig {
   port: number,
@@ -34,37 +33,27 @@ const config: IConfig = ( () => {
   return opts;
 } )();
 
-const envToLogger = {
-  [Env.development]: {
-    transport: {
-      target:  'pino-pretty',
-      options: {
-        colorize:      true,
-        translateTime: "sys:yyyy-mm-dd'T'HH:MM:sso",
-        ignore:        'pid,hostname',
-      },
-    },
-  },
-  [Env.production]: true,
-  [Env.test]:       false,
-};
 
 export default async function start() {
-  let nodeEnv = process.env.NODE_ENV as Env;
-  nodeEnv ??= Env.production;
+  let nodeEnv = process.env.NODE_ENV;
+  nodeEnv ??= ENV.PRODUCTION;
 
-  if ( !Object.keys( Env ).includes( nodeEnv ) ) {
-    nodeEnv = Env.production;
+  if ( Object.values( ENV ).every( v => v.toString() !== nodeEnv ) ) {
+    nodeEnv = ENV.PRODUCTION;
   }
 
   const fastify = Fastify( {
-    logger: envToLogger[nodeEnv],
+    logger: await getAppLoggerConfig( nodeEnv as ENV ),
   } );
 
-  fastify.get( '/', {}, ( request, reply ) => {
-    request.log.info( 'Hello fellaD!!!' );
-    reply.send( { hello: 'world' } );
+  fastify.register( mongodb, {
+    // force to close the mongodb connection when app stopped
+    // the default value is false
+    forceClose: true,
+    url:        process.env.DB_URL,
   } );
+
+  fastify.register( parsers );
 
   fastify.listen( { port: config.port }, ( err, address ) => {
     if ( err ) {
