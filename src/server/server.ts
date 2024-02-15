@@ -1,10 +1,12 @@
 import Fastify from 'fastify';
+import fastifySensible from '@fastify/sensible';
 import _Ajv from 'ajv';
 import mongodb from '@fastify/mongodb';
-import parsers from '../apis/parsers.js';
+
+import swagger from './swagger.js';
+import extractors from '../apis/extractors.js';
 import { ENV } from '../common/constants.js';
 import getAppLoggerConfig from '../services/logger.js';
-
 
 const { default: serverConfig } = await import( './server_config.json', { assert: { type: 'json' } } );
 
@@ -34,7 +36,7 @@ const config: IConfig = ( () => {
 } )();
 
 
-export default async function start() {
+async function initialize() {
   let nodeEnv = process.env.NODE_ENV;
   nodeEnv ??= ENV.PRODUCTION;
 
@@ -46,14 +48,21 @@ export default async function start() {
     logger: await getAppLoggerConfig( nodeEnv as ENV ),
   } );
 
-  fastify.register( mongodb, {
-    // force to close the mongodb connection when app stopped
-    // the default value is false
+  await fastify.register( fastifySensible, {
+    sharedSchemaId: 'HttpError',
+  } );
+  await fastify.register( mongodb, {
+    // force to close the mongodb connection when app stopped, the default value is false
     forceClose: true,
     url:        process.env.DB_URL,
   } );
 
-  fastify.register( parsers );
+  // must come first than service apis
+  if ( nodeEnv === ENV.DEVELOPMENT ) {
+    await fastify.register( swagger );
+  }
+
+  await fastify.register( extractors );
 
   fastify.listen( { port: config.port }, ( err, address ) => {
     if ( err ) {
@@ -63,3 +72,5 @@ export default async function start() {
     fastify.log.info( `Server listening on ${address}` );
   } );
 }
+
+export default { initialize };
